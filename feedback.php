@@ -69,8 +69,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
         </div>
 
         <div class="form-group">
-          <div class="col-sm-12">
+          <div class="col-sm-3">
             <input type="submit" class="btn btn-default" id="form-feedback-send" name="send" value="Отправить">
+          </div>
+
+          <div class="col-sm-9">
+            <div class="g-recaptcha pull-right" data-sitekey="6Ldy6xwUAAAAAOQ0BDl6dtYFgBkpONcLquFkupMK"></div>
           </div>
         </div>
       </form>

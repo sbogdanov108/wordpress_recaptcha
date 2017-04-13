@@ -452,6 +452,9 @@ function twentyseventeen_scripts() {
 	wp_enqueue_script( 'twentyseventeen-global', get_theme_file_uri( '/assets/js/global.js' ), array( 'jquery' ), '1.0', true );
 
 	wp_enqueue_script( 'jquery-scrollto', get_theme_file_uri( '/assets/js/jquery.scrollTo.js' ), array( 'jquery' ), '2.1.2', true );
+  
+  // reCAPTCHA
+  wp_enqueue_script( 'reCAPTCHA', 'https://www.google.com/recaptcha/api.js', array('jquery-scrollto') );
 
 	wp_localize_script( 'twentyseventeen-skip-link-focus-fix', 'twentyseventeenScreenReaderText', $twentyseventeen_l10n );
 
@@ -587,6 +590,22 @@ function my_special_styles($tag, $handle, $src) {
   return $tag;
 }
 add_filter('style_loader_tag', 'my_special_styles', 10, 3);
+
+/**
+ * Подключаем скрипт с добавлением атрибутов async и defer
+ * @param $tag
+ * @param $handle
+ * @param $src
+ *
+ * @return string
+ */
+function my_special_scripts($tag, $handle, $src) {
+  if($handle === 'reCAPTCHA')
+    return '<script src="' . $src . '" async defer></script>' . "\n";
+  
+  return $tag;
+}
+add_filter('script_loader_tag', 'my_special_scripts', 10, 3);
 
 /**
  * Отправка сообщения через форму обратной связи
