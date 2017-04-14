@@ -452,13 +452,8 @@ function twentyseventeen_scripts() {
 	wp_enqueue_script( 'twentyseventeen-global', get_theme_file_uri( '/assets/js/global.js' ), array( 'jquery' ), '1.0', true );
 
 	wp_enqueue_script( 'jquery-scrollto', get_theme_file_uri( '/assets/js/jquery.scrollTo.js' ), array( 'jquery' ), '2.1.2', true );
- 
-	// todo загрузка по условию
-	
-  // reCAPTCHA
-  wp_enqueue_script( 'reCAPTCHA', 'https://www.google.com/recaptcha/api.js', array('jquery-scrollto') );
-
-	wp_localize_script( 'twentyseventeen-skip-link-focus-fix', 'twentyseventeenScreenReaderText', $twentyseventeen_l10n );
+  
+  wp_localize_script( 'twentyseventeen-skip-link-focus-fix', 'twentyseventeenScreenReaderText', $twentyseventeen_l10n );
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
@@ -672,7 +667,7 @@ function callGoogle($gReCaptcha) {
   require('libs/captcha/autoload.php');
   
   // Секретный ключ, который нужно получить на сервисе рекапчи
-  $secretKey = '6Ldy6xwUAAAAAAYemYuya8QB6ehl7VHSB3M-uvGj';
+  $secretKey = 'Ваш секретный ключ';
   
   $recaptcha = new \ReCaptcha\ReCaptcha($secretKey);
   $response = $recaptcha->verify($gReCaptcha); // Делаем запрос на сервис
@@ -682,4 +677,20 @@ function callGoogle($gReCaptcha) {
     return true;
   
   return false;
+}
+
+// Добавляем скрипты по условию
+function add_my_script_where_it_necessery(){
+  // Если это страница http://имя_сайта/feedback
+  // Тогда подключаем нужные нам скрипты
+  if( is_page('feedback') )
+    add_action( 'wp_enqueue_scripts', 'my_scripts_method' );
+}
+add_action('wp', 'add_my_script_where_it_necessery');
+
+// Список скриптов
+function my_scripts_method() {
+  // reCAPTCHA
+  wp_enqueue_script( 'reCAPTCHA', 'https://www.google.com/recaptcha/api.js', array('jquery-scrollto') );
+  wp_enqueue_script( 'captcha', get_theme_file_uri( '/assets/js/captcha.js' ), array('reCAPTCHA') );
 }

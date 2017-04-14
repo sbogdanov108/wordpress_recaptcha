@@ -75,12 +75,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"
 
         <div class="form-group">
           <div class="col-sm-3">
-            <input type="submit" class="btn btn-default" id="form-feedback-send" name="send" value="Отправить">
+            <input type="submit" class="btn btn-default" id="form-feedback-send" name="send" disabled value="Отправить">
           </div>
 
           <div class="col-sm-9">
             <div class="g-recaptcha-wrapper pull-right">
-              <div class="g-recaptcha" data-sitekey="6Ldy6xwUAAAAAOQ0BDl6dtYFgBkpONcLquFkupMK"></div>
+              <div class="g-recaptcha" data-sitekey="6Ldy6xwUAAAAAOQ0BDl6dtYFgBkpONcLquFkupMK" data-callback="aiDaGugl"></div>
               <?= !empty($result['userCaptcha']) ? "<span class='help-block error'>{$result[ 'userCaptcha' ]}</span>" : '' ?>
             </div>
           </div>

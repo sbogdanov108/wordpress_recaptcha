@@ -7,7 +7,6 @@
 /inc/
 /archive.php
 /rtl.css
-/assets/
 /header.php
 /README.txt
 /front-page.php
@@ -17,3 +16,12 @@
 /style.css
 /search.php
 /comments.php
+/assets/js/global.js
+/assets/js/html5.js
+/assets/js/jquery.scrollTo.js
+/assets/js/skip-link-focus-fix.js
+/assets/css/
+/assets/js/navigation.js
+/assets/js/customize-controls.js
+/assets/images/
+/assets/js/customize-preview.js
