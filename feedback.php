@@ -2,13 +2,18 @@
 /*
   Template Name: feedback
 */
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST"
+    && isset($_POST['send'])
+    && isset($_POST['g-recaptcha-response'])) {
   $userSubject = $_POST['userSubject'];
   $userName = $_POST['userName'];
   $userEmail = $_POST['userEmail'];
   $userMessage = $_POST['userMessage'];
+  $gReCaptcha = $_POST['g-recaptcha-response'];
   
-  $result = feedback($userSubject, $userName, $userEmail, $userMessage);
+  // Функция отправки почты, которая вернет false, если mail() не сможет отправить email
+  // Или вернет массив с ошибками
+  $result = feedback($userSubject, $userName, $userEmail, $userMessage, $gReCaptcha);
 }
 ?>
 
@@ -74,7 +79,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
           </div>
 
           <div class="col-sm-9">
-            <div class="g-recaptcha pull-right" data-sitekey="6Ldy6xwUAAAAAOQ0BDl6dtYFgBkpONcLquFkupMK"></div>
+            <div class="g-recaptcha-wrapper pull-right">
+              <div class="g-recaptcha" data-sitekey="6Ldy6xwUAAAAAOQ0BDl6dtYFgBkpONcLquFkupMK"></div>
+              <?= !empty($result['userCaptcha']) ? "<span class='help-block error'>{$result[ 'userCaptcha' ]}</span>" : '' ?>
+            </div>
           </div>
         </div>
       </form>

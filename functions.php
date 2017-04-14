@@ -452,7 +452,9 @@ function twentyseventeen_scripts() {
 	wp_enqueue_script( 'twentyseventeen-global', get_theme_file_uri( '/assets/js/global.js' ), array( 'jquery' ), '1.0', true );
 
 	wp_enqueue_script( 'jquery-scrollto', get_theme_file_uri( '/assets/js/jquery.scrollTo.js' ), array( 'jquery' ), '2.1.2', true );
-  
+ 
+	// todo загрузка по условию
+	
   // reCAPTCHA
   wp_enqueue_script( 'reCAPTCHA', 'https://www.google.com/recaptcha/api.js', array('jquery-scrollto') );
 
@@ -606,42 +608,78 @@ function my_special_scripts($tag, $handle, $src) {
   return $tag;
 }
 add_filter('script_loader_tag', 'my_special_scripts', 10, 3);
-
 /**
  * Отправка сообщения через форму обратной связи
+ *
  * @param $subject
  * @param $name
  * @param $userEmail
  * @param $message
+ * @param $gReCaptcha
  *
  * @return array|bool
  */
-function feedback($subject, $name, $userEmail, $message) {
+function feedback($subject, $name, $userEmail, $message, $gReCaptcha) {
   $errors = [];
+  // Наши данные, которые мы ввели в админке Wordpress
   $adminEmail = get_bloginfo('admin_email');
   $siteName = get_bloginfo('name');
   
+  // Проверяем капчу
+  $checkCaptcha = callGoogle($gReCaptcha);
+  
+  if(!$checkCaptcha) {
+    $errors['userCaptcha'] = 'Произошла ошибка при проверке капчи.';
+  }
+  
+  // Проверяем адрес email, введенный пользователем
   if (empty($userEmail)) {
     $errors['userEmail'] = 'Поле не должно быть пустым.';
   } elseif (!filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
     $errors['userEmail'] = 'Введён неправильный email.';
   }
   
+  // Проверяем сообщение
   if (empty($message)) {
     $errors['userMessage'] = 'Поле не должно быть пустым.';
   }
   
+  // Если нет ошибок, то формируем email
   if (empty($errors)) {
+    // Убираем все теги из данных, введенных пользователем
     $name = wp_strip_all_tags($name);
     $subject = wp_strip_all_tags($subject);
     $message = wp_strip_all_tags($message);
     
     $message = "<h2>Тема: $subject</h2>Пользователь <b>$name</b> пишет:<br/><br/>$message";
-    $subjectForEmail = '=?utf-8?B?'.base64_encode('Сообщение с сайта "' . $siteName . '"').'?=';
-    $headers = "From: $userEmail\r\nReply-to: $userEmail\r\nContent-type: text/html; charset=utf-8\r\n";
+    $subjectForEmail = '=?utf-8?B?' . base64_encode('Сообщение с сайта "' . $siteName . '"') . '?=';
+    $headers = "From: $userEmail\r\nReply-to: $userEmail\r\nContent-type: text/html; charset=utf-8;\r\n";
     
-    return mail($adminEmail, $subjectForEmail, $message, $headers);
+    return mail($adminEmail, $subjectForEmail, $message, $headers); // Отправляем email
   }
   
   return $errors;
+}
+
+/**
+ * Запрос к сервису reCAPTCHA для проверки капчи
+ * @param $gReCaptcha
+ *
+ * @return bool
+ */
+function callGoogle($gReCaptcha) {
+  // Подключаем библиотеку для запроса к сервису
+  require('libs/captcha/autoload.php');
+  
+  // Секретный ключ, который нужно получить на сервисе рекапчи
+  $secretKey = '6Ldy6xwUAAAAAAYemYuya8QB6ehl7VHSB3M-uvGj';
+  
+  $recaptcha = new \ReCaptcha\ReCaptcha($secretKey);
+  $response = $recaptcha->verify($gReCaptcha); // Делаем запрос на сервис
+  
+  // Если запрос был успешно проверен
+  if ($response->isSuccess())
+    return true;
+  
+  return false;
 }
